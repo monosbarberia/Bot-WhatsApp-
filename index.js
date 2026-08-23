@@ -9,7 +9,6 @@ if (!globalThis.crypto) {
 const { default: makeWASocket, DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const { createClient } = require('@supabase/supabase-js');
 const ws = require('ws');
-const qrcode = require('qrcode-terminal');
 const P = require('pino');
 
 // ==================== CONFIGURACIÓN ====================
@@ -186,17 +185,13 @@ async function startBot() {
         console.error('Error pidiendo código de vinculación:', err);
         pairingCodeRequested = false;
       }
-    }, 3000);
+    }, 1000);
   }
 
   sock.ev.on('creds.update', saveCreds);
 
   sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect, qr } = update;
-    if (qr) {
-      console.log('\n📱 Escanea este código desde WhatsApp Business > Dispositivos vinculados:\n');
-      qrcode.generate(qr, { small: true });
-    }
+    const { connection, lastDisconnect } = update;
     if (connection === 'close') {
       const statusCode = lastDisconnect?.error?.output?.statusCode;
       const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
