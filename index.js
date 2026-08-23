@@ -6,7 +6,7 @@ if (!globalThis.crypto) {
   globalThis.crypto = require('crypto').webcrypto;
 }
 
-const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
 const { createClient } = require('@supabase/supabase-js');
 const qrcode = require('qrcode-terminal');
 const P = require('pino');
@@ -151,8 +151,10 @@ async function marcarTurnosOcupados(fechaISO, slots) {
 
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
+  const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
+    version,
     auth: state,
     logger: P({ level: 'silent' }),
   });
