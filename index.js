@@ -150,6 +150,8 @@ async function startBot() {
     logger: P({ level: 'silent' }),
   });
 
+  console.log('🔄 Intentando conectar a WhatsApp...');
+
   sock.ev.on('creds.update', saveCreds);
 
   sock.ev.on('connection.update', (update) => {
@@ -159,9 +161,10 @@ async function startBot() {
       qrcode.generate(qr, { small: true });
     }
     if (connection === 'close') {
-      const shouldReconnect =
-        lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-      console.log('Conexión cerrada. Reconectando:', shouldReconnect);
+      const statusCode = lastDisconnect?.error?.output?.statusCode;
+      const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+      console.log('Conexión cerrada. Código:', statusCode, '| Motivo:', lastDisconnect?.error?.message);
+      console.log('Reconectando:', shouldReconnect);
       if (shouldReconnect) startBot();
     } else if (connection === 'open') {
       console.log('✅ Bot conectado a WhatsApp correctamente');
