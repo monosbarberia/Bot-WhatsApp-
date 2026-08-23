@@ -154,6 +154,10 @@ async function marcarTurnosOcupados(fechaISO, slots) {
 
 // ==================== BOT PRINCIPAL ====================
 
+// Se pide el código de vinculación una sola vez por ejecución del proceso,
+// para que no se genere uno nuevo en cada reintento de conexión.
+let pairingCodeRequested = false;
+
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
   const { version } = await fetchLatestBaileysVersion();
@@ -170,7 +174,8 @@ async function startBot() {
   // En vez de código QR, pedimos un código numérico de 8 dígitos que se
   // ingresa directo en WhatsApp Business (útil porque no hay una segunda
   // pantalla para escanear un QR).
-  if (!sock.authState.creds.registered) {
+  if (!sock.authState.creds.registered && !pairingCodeRequested) {
+    pairingCodeRequested = true;
     const phoneNumber = OWNER_NUMBER.split('@')[0];
     setTimeout(async () => {
       try {
@@ -179,6 +184,7 @@ async function startBot() {
         console.log('En tu iPhone: WhatsApp Business > Configuración > Dispositivos vinculados > Vincular un dispositivo > "Vincular con número de teléfono en su lugar" > ingresa este código.\n');
       } catch (err) {
         console.error('Error pidiendo código de vinculación:', err);
+        pairingCodeRequested = false;
       }
     }, 3000);
   }
