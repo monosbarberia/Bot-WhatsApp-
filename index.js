@@ -159,7 +159,7 @@ async function marcarTurnosOcupados(fechaISO, slots) {
 let pairingCodeRequested = false;
 
 async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
+  const { state, saveCreds } = await useMultiFileAuthState(process.env.AUTH_PATH || './auth_info');
   const { version } = await fetchLatestBaileysVersion();
 
   const sock = makeWASocket({
