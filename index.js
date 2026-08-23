@@ -1,4 +1,11 @@
 require('dotenv').config();
+
+// Node.js 18 no expone `crypto` como variable global por defecto (sí lo hace
+// Node 20+). Baileys lo necesita, así que lo agregamos manualmente aquí.
+if (!globalThis.crypto) {
+  globalThis.crypto = require('crypto').webcrypto;
+}
+
 const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 const { createClient } = require('@supabase/supabase-js');
 const qrcode = require('qrcode-terminal');
